@@ -7,6 +7,10 @@
 //
 
 #import "AppDelegate.h"
+#import "MyTabBarCtrl.h"
+#import "AFNetTool.h"
+#import <AMapFoundationKit/AMapFoundationKit.h>//高德基础地图
+#import <AMapLocationKit/AMapLocationKit.h>//高德定位服务
 
 @interface AppDelegate ()
 
@@ -16,7 +20,43 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    // Override point for customization after application launch.
+    
+    
+    self.window = [[UIWindow alloc] initWithFrame:kScreenBounds];
+    
+    [self.window makeKeyAndVisible];
+    
+    self.window.rootViewController = [[MyTabBarCtrl alloc] init];
+    
+    
+    //高德定位服务
+    [AMapServices sharedServices].apiKey = @"afcaf49546e12ad2623d89e31dd465af";
+    
+    AFNetTool *afntool = [[AFNetTool alloc] init];
+    [afntool currentNetStatus:^(BOOL isConnect, AFNetworkReachabilityStatus currentStatus) {
+        DLog(@"%@",isConnect?@"YES":@"NO");
+        switch (currentStatus) {
+            case AFNetworkReachabilityStatusUnknown:
+                DLog(@"未知的网络");
+                break;
+            case AFNetworkReachabilityStatusNotReachable:
+            {
+                DLog(@"网络未连接");
+                [UIView addMJNotifierWithText:@"连接失败，请检查网络或重试" dismissAutomatically:YES];
+            }
+                break;
+            case AFNetworkReachabilityStatusReachableViaWiFi:
+                DLog(@"WIFI网络");
+                break;
+            case AFNetworkReachabilityStatusReachableViaWWAN:
+                DLog(@"手机网络");
+                break;
+            default:
+                break;
+        }
+    }];
+    
+    
     return YES;
 }
 
@@ -30,7 +70,9 @@
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+
 }
+
 
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
